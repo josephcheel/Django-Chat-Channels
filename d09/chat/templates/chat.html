@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}Chatroom{% endblock %}
+
+{% block styles %}
+	<style>
+		#chat-box {
+
+			height: 78vh;
+			@media (max-width: 768px) {
+				height: 70vh;
+			}
+			overflow-y: auto;
+			/* scrollbar-color: #f1f1f1 #f1f1f1; */
+			scrollbar-color: #c4dcfa #cbc7fa00;
+			/* scrollbar-color: #28b521 #b99243; */
+			scrollbar-width: auto;
+			scroll-padding: 0.5rem;
+			border-radius: 15px;
+			/* scroll */
+		}
+		#chat-form {
+			border-radius: 15px;
+		}
+		.welcome-box {
+			border: 1px solid #f1f1f1;
+			border-radius: 15px;
+			padding: 2rem;
+			word-wrap: break-word;
+		}
+		.notice-box {
+			border: 1px solid #f1f1f1;
+			border-radius: 15px;
+			padding: 0.5em 1.5em 0.5em 1.5em;
+		}
+		.my-message-box {
+			border: 1px solid #f1f1f1;
+			border-radius: 20px 20px 0 20px;
+			padding: 1rem, 1rem, 1rem, 1rem;
+			margin-bottom: 0.2rem;
+			padding-right: 0.4rem;
+			margin-left: 5em;
+		}
+		.other-message-box {
+			border: 1px solid #f1f1f1;
+			border-radius: 20px 20px 20px 0px;
+			padding: 1rem, 1rem, 1rem, 1rem;
+			margin-right: 5em;
+		}
+		.user-connected-box {
+			border: 1px solid #f1f1f1;
+			border-radius: 15px;
+			width: 100%;
+			padding: 1.5em;
+			word-wrap: break-word;
+		}
+	</style>
+{% endblock %}
+{% block content %}
+	<div class="d-flex justify-content-center align-items-center w-100 h-100">
+		<section class="container row p-2"> 
+			<!-- w-100 h-100 -->
+			<main class="col-12 col-md-8 d-flex flex-column">
+				<div>
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<h1 class="mb-0">Chatroom: <strong>{{ chatRoom.name }}</strong></h1>
+						<a href="{% url 'chat:index' %}" class="btn btn-secondary border" style="font-size: 0.7rem;">
+							Back to chatrooms list
+						</a>
+						<!-- <a href="{% url 'chat:index' %}" class="btn btn-secondary border d-flex flex-column justify-content-between" style="width: 30px; height: 20px; padding: 0;">
+							<img src="">
+						  </a> -->
+					</div>
+					<div class="container border mb-2" id="chat-box">
+						<div class="alert alert-success mt-3 welcome-box">
+							<h4 class="alert-heading ">Welcome to the Chatroom, <strong>{{ chatRoom.name }}</strong>!</h4>
+							<!-- <p>We're excited to have you here! You've successfully joined the chatroom and are ready to connect with others. Feel free to jump into the conversation anytime!</p> -->
+							<p>{{ chatRoom.description }}</p>
+							<hr>
+							<!-- <p class="mb-0">If you need any help, just ask! We're here to make your experience enjoyable.</p> -->
+							 <p>{{ chatRoom.sub_description }}</p>
+						  </div>						  
+						<hr class="mb-5">
+						{% for message in messages %}
+							{% if message.sender == user %}
+								<div class="row">
+									<div class="col-12">
+										<div class="d-flex justify-content-end">
+											<div class="alert alert-info my-message-box">
+												<div class="mb-0">
+													{{message.message}}
+												</div>
+												<div class="end-0 bottom-0 text-muted mt-0"  style="font-size: 0.8rem;">
+													<small><strong>{{message.sender.username}}</strong></small> <!--Truncate the string-->
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							{% else %}
+								<div class="row">
+									<div class="col-12">
+										<div class="d-flex justify-content-start">
+											<div class="alert alert-primary other-message-box">
+												<div class="mb-0">
+													{{ message.message }}
+												</div>
+												<div class="end-0 bottom-0 text-muted" style="font-size: 0.8rem;">
+													<small><strong>{{message.sender.username}}</strong></small>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							{% endif %}
+						{% endfor %}
+							
+					</div>
+				</div>
+				<form class="row d-flex justify-content-center flex-grow-0 py-3 px-4 border mt-auto mb-2 pe-2 ps-2" id="chat-form" >
+					<div class="col-lg-11 col-9">
+						<label for="inputMessage" class="visually-hidden">Message</label>
+						<input type="text" class="form-control form-control-lg" id="inputMessage" placeholder="Type your message">
+					</div>
+					<div class="col-lg-1 col-3 d-flex ps-0 align-items-center">
+						<button type="submit" class="btn btn-light border ">Send</button>
+					</div>
+				</form>
+			</main>
+			<aside class="col-4 d-flex flex-column">
+				<div class="d-flex justify-content-end mb-3">
+					<a href="{% url 'account:logout' %}" class="refresh btn btn-dark" style="width: 100px;">
+						Logout
+					</a>
+				</div>
+				<h3>Connected Users</h3>
+				<hr class="mt-0 mb-3">
+				<div class="row" id="connected-users">
+				</div>
+			</aside>
+			
+		</section>
+	</div>
+{% endblock %}
+{% block scripts %}
+	<script>
+		function scrollToBottom() {
+			var chatBox = $('#chat-box');
+			chatBox.scrollTop(chatBox[0].scrollHeight);
+		}
+
+		function replaceConnectedUsers(connected_users) {
+			$('#connected-users').empty();
+			connected_users.forEach(user => {
+				if (user == "{{ user }}")
+					$('#connected-users').append(`<div class="col-12">
+							<div class="d-flex justify-content-center">
+								<div class="alert alert-info user-connected-box" role="alert">
+									<strong>${user}</strong>
+								</div>
+							</div>
+						</div>`);
+				else
+					$('#connected-users').append(`<div class="col-12">
+							<div class="d-flex justify-content-center">
+								<div class="alert alert-primary user-connected-box" role="alert">
+									<strong>${user}</strong>
+								</div>
+							</div>
+						</div>`);
+				});
+			}
+
+		
+		$(document).ready(function() {
+			scrollToBottom();
+		});
+
+		let url = `ws://${window.location.host}/ws/chats/{{ chatRoom.name }}/`;
+
+		const chatSocket = new WebSocket(url);
+		chatSocket.onclose = (e) => {
+			window.location.href = "{% url 'chat:index' %}";
+		};
+		chatSocket.onmessage = (e) => {
+			let data = JSON.parse(e.data);
+			
+			console.log(data);
+			replace = '';
+			if (data.type == 'message')
+			{
+				if (data.username == "{{ user }}")
+				{
+					my_messages = `{% include 'my_messages.html' %}`;
+					replace = my_messages.replace('$(data.message)', data.message).replace('$(data.username)', data.username);
+				}
+				else
+				{
+					other_messages = `{% include 'other_messages.html' %}`;
+					replace = other_messages.replace('$(data.message)', data.message).replace('$(data.username)', data.username);
+				}
+			}
+			else if (data.type == 'joined')
+			{
+				notice = `{% include 'joined_template.html' %}`;
+				replace = notice.replace('$(data.username)', data.username);
+				replaceConnectedUsers(data.connected_users);
+
+			}
+			else if (data.type == 'left')
+			{
+				notice = `{% include 'left_template.html' %}`;
+				replace = notice.replace('$(data.username)', data.username);
+				replaceConnectedUsers(data.connected_users);
+			}
+			$('#chat-box').append(replace);
+			scrollToBottom();
+		}
+		$('#chat-form').submit(() => {
+			event.preventDefault();
+			let message = $('#inputMessage').val();
+			if (message.trim() == '')
+				return;
+			chatSocket.send(JSON.stringify({
+				'message': message
+			}));
+			$('#inputMessage').val('');
+		});
+
+	</script>
+{% endblock %}

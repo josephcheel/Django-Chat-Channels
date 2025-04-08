@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	Availeable Chatrooms
+{% endblock %}
+
+{% block content %}
+
+	<div class="container mt-5">
+		<div class="d-flex justify-content-center align-items-center mb-2">
+			<h1 class="h1 ms-3">Availeable Chatrooms</h1>
+			<a href="{% url 'account:logout' %}" class="refresh btn btn-dark end-0 top-0 m-5">
+				Logout
+			</a>
+		</div>
+		<div class="row">
+			{% for chatroom in chatrooms %}
+				<div class="col-md-3 mb-4">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">{{ chatroom.name }}</h5>
+							<p class="card-text">{{ chatroom.description }}</p>
+							<p class="card-text"><small class="text-muted">{{ chatroom.sub_description }}</small></p>
+							<a href="{% url 'chat:chat' chatroom.name %}" class="btn btn-primary">Enter</a>
+						</div>
+					</div>
+				</div>
+				{% if forloop.counter|divisibleby:4 and not forloop.last %}
+					</div><div class="row">
+				{% endif %}
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}

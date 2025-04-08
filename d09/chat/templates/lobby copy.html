@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	{% load bootstrap5 %}
+	{% bootstrap_css %}
+	{% bootstrap_javascript %}
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<title>Document</title>
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			}
+
+			.d-flex {
+			height: 100%;
+			}
+
+	</style>
+</head>
+<body>
+
+	<!-- <div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 70vh;"> -->
+	<section class="container">
+
+		
+	</section>
+	<div class="d-flex align-items-center justify-content-center" style="height: 100vh; width: 70vh;">
+		<div class="container">
+			<h1>Let's chat</h1>
+			<div class="container border border-primary" id="chat-box">
+				<div class="row">
+					<div class="col-12">
+						<div class="d-flex justify-content-center">
+							<div class="alert alert-primary" role="alert">
+								Hello, I'm a chat message
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<form class="row d-flex justify-content-center flex-grow-0 py-3 px-4 border-top border" id="chat-form" >
+				<div class="col-8">
+					<label for="inputMessage" class="visually-hidden">Message</label>
+					<input type="text" class="form-control form-control-lg" id="inputMessage" placeholder="Type your message">
+				</div>
+				<div class="col-4 d-flex">
+					<button type="submit" class="btn btn-primary mt-1">Send</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	
+	<script>
+		let url = `ws://${window.location.host}/ws/chats/`;
+
+		const chatSocket = new WebSocket(url);
+
+		chatSocket.onmessage = (e) => {
+			let data = JSON.parse(e.data);
+			console.log('Message:', data);
+			// console.log('Message:', e.data);
+		}
+
+	</script>
+</body>
+</html>

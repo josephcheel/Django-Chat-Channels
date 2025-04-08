@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}
+	Account
+{% endblock %}
+{% block content %}
+	<div class="d-flex align-items-center justify-content-center vh-100">
+		<div class="container text-center mb-5">
+			{% if not user.is_authenticated %}
+				<form method="POST" action="{% url 'account:login' %}" id="ajax-form">
+					{% csrf_token %}
+					<h1>Login</h1>
+					<p>
+						 <label>{{ form.username.label }}</label>
+						{{ form.username }}
+					</p>
+					<p>
+						<label>{{ form.password.label }}</label>
+						{{ form.password }} 
+					</p>
+					<div class="d-inline">
+						<button class="btn btn-primary">Log in</button>
+						<a href="{% url 'account:register' %}" class="refresh link-opacity-50 ms-4">Register</a>
+					</div>
+					<div class="text-danger">
+						{{form.non_field_errors.as_text}}
+					</div>
+				</form>	
+			{% else %}
+				<a href="{% url 'account:logout' %}" class="refresh btn btn-dark position-absolute end-0 top-0 m-5" >
+					Logout
+				</a>
+				<h1>Logged as {{ user }}</h1>
+
+				<a href="{% url 'chat:index' %}" class="btn btn-primary mt-1" >
+					Chats
+				</a>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}
+{% block script %}
+	<script>
+		$(document).ready(() => {
+			$('#ajax-form').submit(() => {
+				event.preventDefault();
+
+				$.ajax({
+					type: 'POST',
+					url: '{% url "account:login" %}',
+					data: $('#ajax-form').serialize(),
+					success: (response) => {
+						$("body").html(response);
+					}, 
+					error: function(xhr, status, error) {
+						
+					},
+				})
+			})
+
+			$("a.refresh").click(function(event) {
+				event.preventDefault();
+				
+				var redirect_url = $(this).attr("href");
+				
+				$.ajax({
+					type: 'GET',
+					url: redirect_url,
+					success: (response) => {
+						$("body").html(response);
+						console.log({response});
+					}, 
+					error: function(xhr, status, error) {
+						// console.log({ xhr } )
+						// console.log({ status } )
+						// console.log({ error } )
+					},
+				})
+			});
+		});
+		
+	</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}
+	Register
+{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center vh-100">
+	<div class="container text-center mb-5">
+		<form method="POST" action="{% url 'account:register' %}" id="ajax-form">
+			{% csrf_token %}
+			<h1>Register</h1>
+			<p>
+				<label>{{ form.username.label }}</label>
+				{{ form.username }}
+				{{ form.username.description }}
+			</p>
+			<p>
+				<label>{{ form.password1.label }}</label>
+				{{ form.password1 }}
+			</p>
+			<p>
+				<label>{{ form.password2.label }}</label>
+				{{ form.password2 }} 
+			</p>
+			<div class="d-inline">
+				<button class="btn btn-primary">Register</button>
+			</div>
+			<div class="text-danger">
+				<!-- {{form.non_field_errors.as_text}} -->
+				<p>
+					{{form.username.errors.as_text}}
+				</p>
+				<p>
+					{{form.password1.errors.as_text}}
+				</p>
+				<p>
+					{{form.password2.errors.as_text}}
+				</p>
+			</div>
+
+		</form>	
+	</div>
+</div>
+{% endblock %}
